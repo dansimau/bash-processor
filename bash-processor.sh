@@ -61,7 +61,7 @@ listener()
 				# uniq array
 				params=$(echo "${queue[*]}" |sort |uniq)
 
-				print "Spawning worker (work set: "$params")"
+				print "Spawning worker (work set: \"$params\")"
 				$0 $params &
 
 				unset queue
@@ -74,13 +74,13 @@ worker()
 {
 	print "Worker started."
 	for i in $@; do
-		print "Launching command $worker_cmd for $i";
+		print "Launching command \"$worker_cmd\" for \"$i\"";
 
 		IFS=' '
 		$worker_cmd $i
 		IFS=$'\n'
 
-		[ $? -gt 0 ] && echo "Command failed."
+		[ $? -gt 0 ] && echo "Command failed." >&2
 	done
 	print "Worker finished."
 }
@@ -88,7 +88,7 @@ worker()
 add_to_queue()
 {
 	if [ ! -p "$pipe" ]; then
-		echo "Sorry, can't add this to the queue because no background listener is running!" >&1
+		echo "Sorry, can't add this to the queue because no background listener is running!" >&2
 		exit 1
 	fi
 
