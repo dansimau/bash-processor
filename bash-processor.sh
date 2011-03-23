@@ -15,7 +15,7 @@
 worker_cmd="echo"
 
 # Whether the worker cmd can take more than one parameter at a time
-worker_cmd_multiple=1
+worker_cmd_multiple=0
 
 # Delay before spawning worker
 worker_delay=5
