@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# bash-processor: 
+#
+
+NAME="bash-processor"
+DAEMON_USER="nobody"
+DAEMON_BIN=""
+DAEMON_ARGS="--daemon"
+
+DAEMON_NAME=${DAEMON_BIN##*/}
+
+# Source function library
+. /etc/init.d/functions
+
+RETVAL=0
+
+start() {
+	echo -n $"Starting $NAME: " 
+	daemon --user $DAEMON_USER $DAEMON_BIN $DAEMON_ARGS
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$DAEMON_NAME
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $NAME: " 
+	killproc $DAEMON_NAME
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$DAEMON_NAME
+	return $RETVAL
+}	
+
+restart() {
+	stop
+	start
+}	
+
+reload() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	  start
+	;;
+  stop)
+	  stop
+	;;
+  status)
+	status $DAEMON_NAME
+	;;
+  restart)
+	  restart
+	;;
+  condrestart)
+	  [ -f /var/lock/subsys/$DAEMON_NAME ] && restart || :
+	;;
+  reload)
+	reload
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}" 
+	exit 1
+esac
+
+exit $?
