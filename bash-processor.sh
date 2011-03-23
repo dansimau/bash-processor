@@ -116,7 +116,7 @@ case $1 in
 			listener $*
 		else
 			set -m
-			$0 --daemon -f $* 2>&1 1>$log &
+			$0 --daemon -f $* 2>&1 1>>$log &
 			disown
 		fi
 		;;
