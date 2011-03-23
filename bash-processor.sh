@@ -80,7 +80,7 @@ worker()
 	if [ $worker_cmd_multiple -gt 0 ]; then
 		print "Launching command \"$worker_cmd\" for \"$@\"";
 		IFS=' '
-		$worker_cmd "$@"
+		$worker_cmd "$@" 2>&1>>$log
 		IFS=$'\n'
 		[ $? -gt 0 ] && echo "Command failed." >&2
 
@@ -88,7 +88,7 @@ worker()
 		for i in "$@"; do
 			print "Launching command \"$worker_cmd\" for \"$i\"";
 			IFS=' '
-			$worker_cmd "$i"
+			$worker_cmd "$i" 2>&1>>$log
 			IFS=$'\n'
 			[ $? -gt 0 ] && echo "Command failed." >&2
 		done
