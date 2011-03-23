@@ -14,6 +14,9 @@
 #worker_cmd="$(dirname $0)/do-something.sh"
 worker_cmd="echo"
 
+# Whether the worker cmd can take more than one parameter at a time
+worker_cmd_multiple=1
+
 # Delay before spawning worker
 worker_delay=5
 
@@ -73,15 +76,24 @@ listener()
 worker()
 {
 	print "Worker started."
-	for i in $@; do
-		print "Launching command \"$worker_cmd\" for \"$i\"";
 
+	if [ $worker_cmd_multiple -gt 0 ]; then
+		print "Launching command \"$worker_cmd\" for \"$@\"";
 		IFS=' '
-		$worker_cmd $i
+		$worker_cmd "$@"
 		IFS=$'\n'
-
 		[ $? -gt 0 ] && echo "Command failed." >&2
-	done
+
+	else
+		for i in "$@"; do
+			print "Launching command \"$worker_cmd\" for \"$i\"";
+			IFS=' '
+			$worker_cmd "$i"
+			IFS=$'\n'
+			[ $? -gt 0 ] && echo "Command failed." >&2
+		done
+	fi
+
 	print "Worker finished."
 }
 
