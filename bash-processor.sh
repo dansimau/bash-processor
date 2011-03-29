@@ -17,7 +17,8 @@ worker_cmd="echo"
 # Timeout before spawning a worker (if queue doesn't reach worker_set_size)
 worker_delay=5
 
-# Number of items received in the queue before spawning a worker
+# Number of items received in the queue before spawning a worker (set to -1 to
+# disable)
 worker_set_size=20
 
 # Whether the worker cmd can take more than one parameter at a time
