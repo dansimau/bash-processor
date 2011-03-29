@@ -14,11 +14,14 @@
 #worker_cmd="$(dirname $0)/do-something.sh"
 worker_cmd="echo"
 
+# Timeout before spawning a worker (if queue doesn't reach worker_set_size)
+worker_delay=5
+
+# Number of items received in the queue before spawning a worker
+worker_set_size=20
+
 # Whether the worker cmd can take more than one parameter at a time
 worker_cmd_multiple=0
-
-# Delay before spawning worker
-worker_delay=5
 
 # Filename of log for daemon
 log=$(dirname $0)/$(basename $0 .sh).log
@@ -54,17 +57,29 @@ listener()
 
 	while true; do
 	
+		# Spawn a worker if queue has reached the set size
+		if [ ${#queue[@]} -eq $worker_set_size ]; then
+
+				# uniq array
+				params=$(echo "${queue[*]}" |sort |uniq)
+
+				print "Spawning worker, set size reached (work set: \"$params\")"
+				$0 $params &
+
+				unset queue
+
 		# Read filenames from pipe. After x seconds of receiving nothing (delay), kick off the worker.
-		if read -t $worker_delay line <&3; then
+		elif read -t $worker_delay line <&3; then
 			print "Received: \"$line\". Adding to queue."
 			queue=( "${queue[@]}" "$line" )
+
 		else
 			if [ ${#queue[@]} -gt 0 ]; then
 
 				# uniq array
 				params=$(echo "${queue[*]}" |sort |uniq)
 
-				print "Spawning worker (work set: \"$params\")"
+				print "Spawning worker after timeout (work set: \"$params\")"
 				$0 $params &
 
 				unset queue
