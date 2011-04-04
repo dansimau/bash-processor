@@ -1,6 +1,9 @@
 #!/bin/bash
 #
-# bash-processor: 
+# bash-processor: <description>
+#
+# chkconfig: 345 90 10
+# description: <description>
 #
 
 NAME="bash-processor"
